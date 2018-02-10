@@ -12,16 +12,21 @@ def send_message(message_text):
                   'text': message_text,
                   'disable_web_page_preview': True}
     r = get(url, params=parameters)
-    print("send_message status:", r)
+    return r
 
 
-def send_image(image_url):
+def send_image(image_url, message_text=None):
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendPhoto'
-    parameters = {'chat_id': config.chat_id,
-                  'photo': image_url,
-                  'disable_notification': True}
+    if message_text:
+        parameters = {'chat_id': config.chat_id,
+                      'photo': image_url,
+                      'caption': message_text}
+    else:
+        parameters = {'chat_id': config.chat_id,
+                      'photo': image_url,
+                      'disable_notification': True}
     r = get(url, params=parameters)
-    print("send_image status:", r)
+    return r
 
 
 if __name__ == '__main__':
@@ -33,10 +38,15 @@ if __name__ == '__main__':
             if record_hash in posted_records_hashes:
                 continue
             else:
-                send_message(wall_record_data['text'].replace("<br>", '\n'))
-                if 'image' in wall_record_data:
-                    send_image(wall_record_data['image'])
                 posted_records_hashes.append(record_hash)
+                message_text = wall_record_data['text'].replace("<br>", '\n')
+                if 'image' in wall_record_data:
+                    if len(message_text) > 200:
+                        send_image(wall_record_data['image'])
+                    else:
+                        send_image(wall_record_data['image'], message_text)
+                        continue
+                send_message(message_text)
         if len(posted_records_hashes) > 100:
             del posted_records_hashes[0]
-        sleep(15)
+        sleep(30)
