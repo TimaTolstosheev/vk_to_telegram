@@ -17,14 +17,12 @@ def send_message(message_text):
 
 def send_image(image_url, message_text=None):
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendPhoto'
+    parameters = {'chat_id': config.chat_id,
+                  'photo': image_url}
     if message_text:
-        parameters = {'chat_id': config.chat_id,
-                      'photo': image_url,
-                      'caption': message_text}
+        parameters['caption'] = message_text
     else:
-        parameters = {'chat_id': config.chat_id,
-                      'photo': image_url,
-                      'disable_notification': True}
+        parameters['disable_notification'] = True
     r = get(url, params=parameters)
     return r
 
