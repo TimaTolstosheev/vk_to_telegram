@@ -1,5 +1,4 @@
 import config
-import hashlib
 
 from time import sleep
 from requests import get
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     while True:
         for group in config.vk_group_ids:
             wall_record_data = get_data_from_last_wall_record(group)
-            record_hash = hashlib.md5(wall_record_data['text'].encode()).hexdigest()
+            record_hash = hash(frozenset(wall_record_data.items()))
             if record_hash in posted_records_hashes:
                 continue
             else:
