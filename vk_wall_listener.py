@@ -7,19 +7,24 @@ def get_last_wall_record(group_id):
     url = 'https://api.vk.com/method/wall.get'
     parameters = {'owner_id': group_id,
                   'access_token': config.vk_token,
-                  'count': 1}
-    return requests.get(url, params=parameters).text
+                  'count': 2}
+    r = requests.get(url, params=parameters).text
+    response_json = json.loads(r)
+    if 'is_pinned' in response_json['response'][1]:
+        last_record = response_json['response'][2]
+    else:
+        last_record = response_json['response'][1]
+    return last_record
 
 
-def get_data_from_response(response):
-    data_dict = json.loads(response)
+def get_data_from_record(record):
     result = dict()
-    result['text'] = data_dict['response'][1]['text']
-    result['id'] = data_dict['response'][1]['id']
-    if 'photo' in data_dict['response'][1]['attachment']:
-        result['image'] = data_dict['response'][1]['attachment']['photo']['src_big']
+    result['text'] = record['text']
+    result['id'] = record['id']
+    if 'photo' in record['attachment']:
+        result['image'] = record['attachment']['photo']['src_big']
     return result
 
 
 def get_data_from_last_wall_record(group_id):
-    return get_data_from_response(get_last_wall_record(group_id))
+    return get_data_from_record(get_last_wall_record(group_id))
