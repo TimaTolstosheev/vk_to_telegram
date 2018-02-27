@@ -20,7 +20,6 @@ def get_last_wall_record(group_id):
 def get_data_from_record(record):
     result = dict()
     result['text'] = record['text']
-    result['id'] = record['id']
     if 'photo' in record['attachment']:
         result['image'] = record['attachment']['photo']['src_big']
     return result
