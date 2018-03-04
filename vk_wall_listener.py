@@ -20,10 +20,14 @@ def get_last_wall_record(group_id):
 
 def get_data_from_record(record):
     result = dict()
+    attachments=list()
     result['text'] = record['text']
     try:
-        if 'photo' in record['attachment']:
-            result['image'] = record['attachment']['photo']['src_big']
+        for attachment in record['attachments']:
+            if attachment['type'] == 'photo':
+               attachments.append(attachment['photo']['src_big'])
+
+        result['images']=attachments
     except KeyError:
         pass
     return result
