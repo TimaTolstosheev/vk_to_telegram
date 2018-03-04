@@ -1,4 +1,5 @@
 import config
+import json
 
 from time import sleep
 from requests import get
@@ -26,22 +27,32 @@ def send_image(image_url, message_text=None):
     return r
 
 
+def send_media_group(media_urls):
+    url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMediaGroup'
+    parameters = {'chat_id': config.chat_id,
+                  'media': json.dumps(media_urls)}
+    r = get(url, params=parameters)
+    return r
+
 if __name__ == '__main__':
     posted_records_hashes = []
     while True:
         for group in config.vk_group_ids:
             wall_record_data = get_data_from_last_wall_record(group)
-            record_hash = hash(frozenset(wall_record_data.items()))
+            record_hash = hash(repr(wall_record_data.items()))
             if record_hash in posted_records_hashes:
                 continue
             else:
                 posted_records_hashes.append(record_hash)
                 message_text = wall_record_data['text'].replace("<br>", '\n')
-                if 'image' in wall_record_data:
+                if 'images' in wall_record_data:
+                    if len(wall_record_data['images']) > 1:
+                        send_media_group(wall_record_data['images'])
+                        continue
                     if len(message_text) > 200:
-                        send_image(wall_record_data['image'])
+                        send_image(wall_record_data['images'])
                     else:
-                        send_image(wall_record_data['image'], message_text)
+                        send_image(wall_record_data['images'], message_text)
                         continue
                 send_message(message_text)
         if len(posted_records_hashes) > 100:
