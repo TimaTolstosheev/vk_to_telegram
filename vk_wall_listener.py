@@ -26,7 +26,6 @@ def get_data_from_record(record):
         for attachment in record['attachments']:
             if attachment['type'] == 'photo':
                attachments.append(attachment['photo']['src_big'])
-
         result['images']=attachments
     except KeyError:
         pass
