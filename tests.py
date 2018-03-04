@@ -25,7 +25,7 @@ class APIConnector:
 class VK_APIConnector(APIConnector):
     def __init__(self, api_url, app_token,
                  request_sender = RealRequestSender):
-        super().__init__(api_url, app_token, 
+        super().__init__(api_url, app_token,
                          request_sender)
 
     def sendRequest(self, request_name, parameters):
@@ -33,7 +33,7 @@ class VK_APIConnector(APIConnector):
         parameters['access_token'] = self._app_token
 
         return self._request_sender.\
-            sendRequestWithParams(vk_request, 
+            sendRequestWithParams(vk_request,
                                      parameters)
 
 class VK_Group():
@@ -76,7 +76,7 @@ class VK_API_Tester(unittest.TestCase):
                 self.test_token)
 
     def test_GroupGetWallRecords(self):
-        test_group = VK_Group('test_id', 
+        test_group = VK_Group('test_id',
                               self.test_connector)
 
         test_group.getLastWallRecords(2)
