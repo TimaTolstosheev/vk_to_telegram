@@ -7,7 +7,8 @@ def get_last_wall_record(group_id):
     url = 'https://api.vk.com/method/wall.get'
     parameters = {'owner_id': group_id,
                   'access_token': config.vk_token,
-                  'count': 2}
+                  'count': 2,
+                  'version': 5.73}
     r = requests.get(url, params=parameters).text
     response_json = json.loads(r)
     if 'is_pinned' in response_json['response'][1]:
