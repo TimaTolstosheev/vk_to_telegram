@@ -28,11 +28,15 @@ def send_image(image_url, message_text=None):
 
 
 def send_media_group(media_urls):
+    input_media_list = list()
+    for url in media_urls:
+        input_media_list.append({'type':'photo','media':url})
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMediaGroup'
     parameters = {'chat_id': config.chat_id,
-                  'media': json.dumps(media_urls)}
+                  'media': json.dumps(input_media_list)}
     r = get(url, params=parameters)
     return r
+
 
 if __name__ == '__main__':
     posted_records_hashes = []
@@ -49,11 +53,11 @@ if __name__ == '__main__':
                     if len(wall_record_data['images']) > 1:
                         send_media_group(wall_record_data['images'])
                         continue
-                    if len(message_text) > 200:
-                        send_image(wall_record_data['images'])
-                    else:
+                    if len(message_text) < 200:
                         send_image(wall_record_data['images'], message_text)
                         continue
+                    else:
+                        send_image(wall_record_data['images'])
                 send_message(message_text)
         if len(posted_records_hashes) > 100:
             del posted_records_hashes[0]
