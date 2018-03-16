@@ -30,7 +30,7 @@ def get_data_from_record(record):
             if attachment['type'] == 'video':
                ownerID=str(attachment['video']['owner_id'])
                vid=str(attachment['video']['vid'])
-               video_url='https://vk.com/video'+ownerID+'_'+vid #link to attached video 
+               video_url='https://vk.com/video'+ownerID+'_'+vid #link to attached video
                videos.append(video_url)
 
         result['images']=attachments
