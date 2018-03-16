@@ -21,13 +21,20 @@ def get_last_wall_record(group_id):
 def get_data_from_record(record):
     result = dict()
     attachments=list()
+    videos=list()#list with links to all attached videos
     result['text'] = record['text']
     try:
         for attachment in record['attachments']:
             if attachment['type'] == 'photo':
                attachments.append(attachment['photo']['src_big'])
+            if attachment['type'] == 'video':
+               ownerID=str(attachment['video']['owner_id'])
+               vid=str(attachment['video']['vid'])
+               video_url='https://vk.com/video'+ownerID+'_'+vid #link to attached video
+               videos.append(video_url)
 
         result['images']=attachments
+        result['videos']=videos #new key with list of all video links
     except KeyError:
         pass
     return result
