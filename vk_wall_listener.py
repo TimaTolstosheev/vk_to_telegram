@@ -44,7 +44,8 @@ def get_last_wall_record(group_id):
 
 def get_data_from_record(record):
     result = dict()
-    attachments = list()
+    attachments=list()
+    videos=list()#list with links to all attached videos
     result['text'] = record['text']
     result['record_id'] = int(str(record['to_id']) + str(record['date']) + str(record['id'])) # извращение, но вроде только так можно именно линейно склеить три числа в одно, а не сложить математически
     if ('copy_owner_id' in record and 'copy_post_date' in record and 'copy_post_id' in record):
@@ -55,8 +56,14 @@ def get_data_from_record(record):
         for attachment in record['attachments']:
             if attachment['type'] == 'photo':
                attachments.append(attachment['photo']['src_big'])
+            if attachment['type'] == 'video':
+               ownerID=str(attachment['video']['owner_id'])
+               vid=str(attachment['video']['vid'])
+               video_url='https://vk.com/video'+ownerID+'_'+vid #link to attached video
+               videos.append(video_url)
 
-        result['images'] = attachments
+        result['images']=attachments
+        result['videos']=videos #new key with list of all video links
     except KeyError:
         pass
     result['hash'] = calculate_hash_for_record(result)    # формируем хеш и дописываем отдельным полем в словарь
