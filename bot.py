@@ -28,9 +28,12 @@ def send_image(image_url, message_text=None):
 
 
 def send_media_group(media_urls):
+    input_media_list = list()
+    for url in media_urls:
+        input_media_list.append({'type':'photo','media':url})
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMediaGroup'
     parameters = {'chat_id': config.chat_id,
-                  'media': json.dumps(media_urls)}
+                  'media': json.dumps(input_media_list)}
     r = get(url, params=parameters)
     return r
 
@@ -83,7 +86,7 @@ def add_id_to_posted(new_id, chat):
 
 
 if __name__ == '__main__':
-    posted_records_hashes = []  # что-то мне немного странно, что мы их объявляем здесь, а потом обращаемся в функциях выше — это нормально? или их лучше инициализировать в корне в самом начале?
+    posted_records_hashes = []
     posted_records_ids = []
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
     while True:
