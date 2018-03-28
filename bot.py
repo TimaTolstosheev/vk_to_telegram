@@ -34,6 +34,7 @@ def send_media_group(media_urls):
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMediaGroup'
     parameters = {'chat_id': config.chat_id,
                   'media': json.dumps(input_media_list)}
+                  'media': json.dumps(media_urls)}
     r = get(url, params=parameters)
     return r
 
@@ -101,11 +102,11 @@ if __name__ == '__main__':
                     if len(current_record['images']) > 1:
                         send_media_group(current_record['images'])
                         continue
-                    if len(message_text) > 200:
-                        send_image(current_record['images'])
-                    else:
+                    if len(message_text) < 200:
                         send_image(current_record['images'], message_text)
                         continue
+                    else:
+                        send_image(current_record['images'])
                 send_message(message_text)
         if len(posted_records_hashes) > 100:
             del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД
