@@ -16,3 +16,5 @@ service token is enough in most cases
   (e.g.: `(group_id1, group_id2, group_id3)` or `(group_id)`)
   
   Note that VK groups ids starts with `-`, e.g.: `-0000001`.
+
+new changes
