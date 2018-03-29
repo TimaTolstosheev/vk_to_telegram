@@ -34,7 +34,6 @@ def send_media_group(media_urls):
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMediaGroup'
     parameters = {'chat_id': config.chat_id,
                   'media': json.dumps(input_media_list)}
-                  'media': json.dumps(media_urls)}
     r = get(url, params=parameters)
     return r
 
