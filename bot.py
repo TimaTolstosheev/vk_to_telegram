@@ -38,27 +38,75 @@ def send_media_group(media_urls):
     return r
 
 
+def has_already_been_reposted(record, chat):
+    hashes = get_posted_hashes(chat)
+    ids = get_posted_ids(chat)
+    if ((record['hash'] in hashes)
+            or (record['record_id'] in ids)
+            or ((record['original_record_id'] != None)
+                    and (record['original_record_id'] in ids))):
+        return True
+    else:
+        return False
+
+
+def get_posted_hashes(chat):
+    return posted_records_hashes
+    # заменить потом на нормальную имплементацию с БД
+
+def get_posted_ids(chat):
+    return posted_records_ids
+    # заменить потом на нормальную имплементацию с БД
+
+def get_posted_original_ids(chat):
+    return posted_records_original_ids
+    # заменить потом на нормальную имплементацию с БД
+
+
+def add_record_to_posted(record, chat):
+    add_hash_to_posted(record['hash'], chat)
+    add_id_to_posted(record['record_id'], chat)
+    if record['original_record_id'] != None:
+        add_id_to_posted(record['original_record_id'], chat)    # NB! я намеренно сливаю и id конечных постов, и id оригинальных постов в одно место (для чего — см. ниже)
+    # тут мы проверяем на выполнение любого условия, приводящего к отмене переброса в Телеграм:
+    # — либо такое содержимое уже перебрасывали
+    #       (определяем по хешу, учитывающему: а) текст, б) объём каждой картинки
+    #       в любом порядке, если есть картинки; подробнее см. в calculate_hash_for_record())
+    # — либо перпебрасывали тот же самый пост, который сейчас пытаемся перебросить
+    #       (определяем по id этого поста)
+    # — либо перебрасывали репост того же самого оригинального поста
+    #       или тот же пост, репост которого сейчас пытаемся перебросить
+    #       (определяем по id этого и id оригинального поста, сравнивая с общей базой id)
+
+def add_hash_to_posted(new_hash, chat):
+    posted_records_hashes.append(new_hash)    # пока возвращаем временный общий список; заменить потом на нормальную имплементацию
+
+def add_id_to_posted(new_id, chat):
+    posted_records_ids.append(new_id)    # то же самое
+
+
 if __name__ == '__main__':
     posted_records_hashes = []
+    posted_records_ids = []
+    current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
     while True:
         for group in config.vk_group_ids:
-            wall_record_data = get_data_from_last_wall_record(group)
-            record_hash = hash(repr(wall_record_data.items()))
-            if record_hash in posted_records_hashes:
+            current_record = get_data_from_last_wall_record(group)
+            if has_already_been_reposted(current_record, current_chat):
                 continue
             else:
-                posted_records_hashes.append(record_hash)
-                message_text = wall_record_data['text'].replace("<br>", '\n')
-                if 'images' in wall_record_data:
-                    if len(wall_record_data['images']) > 1:
-                        send_media_group(wall_record_data['images'])
+                add_record_to_posted(current_record, current_chat)
+                message_text = current_record['text'].replace("<br>", '\n')
+                if 'images' in current_record:
+                    if len(current_record['images']) > 1:
+                        send_media_group(current_record['images'])
                         continue
                     if len(message_text) < 200:
-                        send_image(wall_record_data['images'], message_text)
+                        send_image(current_record['images'], message_text)
                         continue
                     else:
-                        send_image(wall_record_data['images'])
+                        send_image(current_record['images'])
                 send_message(message_text)
         if len(posted_records_hashes) > 100:
-            del posted_records_hashes[0]
+            del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД
         sleep(30)
