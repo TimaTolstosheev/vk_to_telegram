@@ -84,11 +84,14 @@ def add_hash_to_posted(new_hash, chat):
 def add_id_to_posted(new_id, chat):
     posted_records_ids.append(new_id)    # то же самое
 
+def test(value=''):
+    return value
 
-if __name__ == '__main__':
+def repost():#все засовываем в функцию, которая вызывается, как только сервер получает post
     posted_records_hashes = []
     posted_records_ids = []
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
+    return 'Starting infinite while'
     while True:
         for group in config.vk_group_ids:
             current_record = get_data_from_last_wall_record(group)
