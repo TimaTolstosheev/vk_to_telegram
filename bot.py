@@ -84,21 +84,18 @@ def add_hash_to_posted(new_hash, chat):
 def add_id_to_posted(new_id, chat):
     posted_records_ids.append(new_id)    # то же самое
 
-def test(value=''):
-    return value
 
 def repost():#все засовываем в функцию, которая вызывается, как только сервер получает post
     posted_records_hashes = []
     posted_records_ids = []
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
-    return 'Starting infinite while'
     while True:
         for group in config.vk_group_ids:
             current_record = get_data_from_last_wall_record(group)
             if has_already_been_reposted(current_record, current_chat):
                 continue
             else:
-                add_record_to_posted(current_record, current_chat)
+                add_record_to_posted(current_record, current_chat)                
                 message_text = current_record['text'].replace("<br>", '\n')
                 if 'images' in current_record:
                     if len(current_record['images']) > 1:
@@ -113,3 +110,4 @@ def repost():#все засовываем в функцию, которая вы
         if len(posted_records_hashes) > 100:
             del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД
         sleep(30)
+        return 'Data has been sent'
