@@ -111,3 +111,5 @@ def repost():#все засовываем в функцию, которая вы
             del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД
         sleep(30)
         return 'Data has been sent'
+
+def test(request_type):return 'Request = '+request_type+'. Test function called successfully!'
