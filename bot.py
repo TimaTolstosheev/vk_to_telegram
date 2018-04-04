@@ -5,6 +5,9 @@ from time import sleep
 from requests import get
 from vk_wall_listener import get_data_from_last_wall_record
 
+from flask import Flask
+from flask import render_template
+from flask import request
 
 def send_message(message_text):
     url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMessage'
@@ -89,27 +92,40 @@ def repost():#все засовываем в функцию, которая вы
     posted_records_hashes = []
     posted_records_ids = []
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
-    while True:
-        for group in config.vk_group_ids:
-            current_record = get_data_from_last_wall_record(group)
-            if has_already_been_reposted(current_record, current_chat):
-                continue
-            else:
-                add_record_to_posted(current_record, current_chat)                
-                message_text = current_record['text'].replace("<br>", '\n')
-                if 'images' in current_record:
-                    if len(current_record['images']) > 1:
-                        send_media_group(current_record['images'])
-                        continue
-                    if len(message_text) < 200:
-                        send_image(current_record['images'], message_text)
-                        continue
-                    else:
-                        send_image(current_record['images'])
-                send_message(message_text)
-        if len(posted_records_hashes) > 100:
-            del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД
-        sleep(30)
-        return 'Data has been sent'
+    for group in config.vk_group_ids:
+        current_record = get_data_from_last_wall_record(group)
+        if has_already_been_reposted(current_record, current_chat):
+            continue
+        else:
+            add_record_to_posted(current_record, current_chat)                
+            message_text = current_record['text'].replace("<br>", '\n')
+            if 'images' in current_record:
+                if len(current_record['images']) > 1:
+                    send_media_group(current_record['images'])
+                    continue
+                if len(message_text) < 200:
+                    send_image(current_record['images'], message_text)
+                    continue
+                else:
+                    send_image(current_record['images'])
+            send_message(message_text)
+    if len(posted_records_hashes) > 100:
+        del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД"""
+    return 'ok' #VK требует возврата 'ok' в ответ на callback
 
-def test(request_type):return 'Request = '+request_type+'. Test function called successfully!'
+
+#---Flask-server---
+
+app = Flask(__name__)
+
+#secret_key = config.secret_callback_key #ключ для настройки коллбэков. Можно прописать в конфиге
+secret_key = '241683264f'
+
+@app.route('/bot', methods=['POST','GET']) # на этот адрес VK должен отправлять колбэки
+def bot():
+    if request.method == 'POST':
+        if request.form['type'] == 'confirmation': return secret_key #ответ на подтверждение использования колбэков
+        elif request.form['type'] == 'wall_post_new': return repost() #на событие нового поста вызывается repost()
+
+
+if __name__== '__main__': app.run(host='0.0.0.0')
