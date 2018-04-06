@@ -102,12 +102,12 @@ def repost(group):#все засовываем в функцию, которая
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
     current_record = get_data_from_last_wall_record(group)
     if not(has_already_been_reposted(current_record, current_chat)):
-        add_record_to_posted(current_record, current_chat)                
+        add_record_to_posted(current_record, current_chat)
         message_text = current_record['text'].replace("<br>", '\n')
         if 'pictures' in current_record:
             if len(current_record['pictures']) > 1:
                 send_media_group(current_record['pictures'])
-            if len(message_text) < 200:                
+            if len(message_text) < 200:
                 send_image(current_record['pictures'], message_text)
             else:
                 send_image(current_record['pictures'])
@@ -119,9 +119,7 @@ def repost(group):#все засовываем в функцию, которая
         del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД"""
     return 'ok' #VK требует возврата 'ok' в ответ на callback
 
-
 #---Flask-server---
-
 app = Flask(__name__)
 
 #secret_key = config.secret_callback_key #ключ для настройки коллбэков. Можно прописать в конфиге
