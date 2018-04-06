@@ -119,9 +119,7 @@ def repost(group):#все засовываем в функцию, которая
         del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД"""
     return 'ok' #VK требует возврата 'ok' в ответ на callback
 
-
 #---Flask-server---
-
 app = Flask(__name__)
 
 #secret_key = config.secret_callback_key #ключ для настройки коллбэков. Можно прописать в конфиге
