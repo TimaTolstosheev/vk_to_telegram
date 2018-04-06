@@ -134,6 +134,7 @@ def bot():
         elif request.form['type'] == 'wall_post_new':
             group=request.form['group_id']
             return repost(group) #на событие нового поста вызывается repost()
+        else: return 'ok'#возвращем вк ок на любое другое событие, иначе он перестанет нам слать колбеки
 
 @app.route('/index')#форма, которая отправляет POST в /bot. Чтобы удобнее тестить
 def index():
