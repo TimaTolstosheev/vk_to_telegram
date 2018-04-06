@@ -127,5 +127,8 @@ def bot():
             group=request.form['group_id']
             return repost(group) #на событие нового поста вызывается repost()
 
-
+@app.route('/index')
+def index():
+    return render_template('index.html')
+    
 if __name__== '__main__': app.run(host='0.0.0.0')
