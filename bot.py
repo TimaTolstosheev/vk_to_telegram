@@ -40,6 +40,15 @@ def send_media_group(media_urls):
     r = get(url, params=parameters)
     return r
 
+#------------Файлом Телеграм разрешает отправить только контент не более 20Мб,
+#------------поэтому отправить видео = отправить сообщение с текстом, где разрешено превью контента.
+def send_video(video_url):
+    url = 'https://api.telegram.org/bot' + config.telegram_token + '/sendMessage'
+    parameters = {'chat_id': config.chat_id,
+                  'text': video_url,
+                  'disable_web_page_preview': False}
+    r = get(url, params=parameters)
+    return r
 
 def has_already_been_reposted(record, chat):
     hashes = get_posted_hashes(chat)
@@ -87,25 +96,24 @@ def add_hash_to_posted(new_hash, chat):
 def add_id_to_posted(new_id, chat):
     posted_records_ids.append(new_id)    # то же самое
 
-
+posted_records_hashes = []
+posted_records_ids = []
 def repost(group):#все засовываем в функцию, которая вызывается, как только сервер получает post
-    posted_records_hashes = []
-    posted_records_ids = []
     current_chat = config.chat_id    # потом надо будет подставлять сюда каждый чат отдельно, если мы хотим добавить работу с разными чатами
     current_record = get_data_from_last_wall_record(group)
     if not(has_already_been_reposted(current_record, current_chat)):
         add_record_to_posted(current_record, current_chat)                
         message_text = current_record['text'].replace("<br>", '\n')
-        if 'images' in current_record:
-            if len(current_record['images']) > 1:
-                send_media_group(current_record['images'])
-                return 'ok'
-            if len(message_text) < 200:
-                send_image(current_record['images'], message_text)
-                return 'ok'
+        if 'pictures' in current_record:
+            if len(current_record['pictures']) > 1:
+                send_media_group(current_record['pictures'])
+            if len(message_text) < 200:                
+                send_image(current_record['pictures'], message_text)
             else:
-                send_image(current_record['images'])
-                return 'ok'
+                send_image(current_record['pictures'])
+        if 'videos' in current_record:
+            for video in current_record['videos']: #----каждое видео постится отдельным сообщением, потому что превьюится только первое
+                send_video(video)
         send_message(message_text)
     if len(posted_records_hashes) > 100:
         del posted_records_hashes[0]    # это точно надо будет куда-то выводить отдельно, особенно когда это уже будет не временная переменная, а БД"""
@@ -127,7 +135,7 @@ def bot():
             group=request.form['group_id']
             return repost(group) #на событие нового поста вызывается repost()
 
-@app.route('/index')
+@app.route('/index')#форма, которая отправляет POST в /bot. Чтобы удобнее тестить
 def index():
     return render_template('index.html')
     
