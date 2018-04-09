@@ -122,20 +122,20 @@ def repost(group):#все засовываем в функцию, которая
 #---Flask-server---
 app = Flask(__name__)
 
-#secret_key = config.secret_callback_key #ключ для настройки коллбэков. Можно прописать в конфиге
-secret_key = '241683264f'
+secret_key = config.secret_callback_key #ключ для настройки коллбэков. Можно прописать в конфиге
 
 @app.route('/bot', methods=['POST','GET']) # на этот адрес VK должен отправлять колбэки
 def bot():
     if request.method == 'POST':
-        if request.form['type'] == 'confirmation': return secret_key #ответ на подтверждение использования колбэков
-        elif request.form['type'] == 'wall_post_new':
-            group=request.form['group_id']
+        content=request.get_json()
+        if content['type'] == 'confirmation': return secret_key #ответ на подтверждение использования колбэков
+        elif content['type'] == 'wall_post_new':
+            group=content['group_id']
             return repost(group) #на событие нового поста вызывается repost()
-        else: return 'ok'#возвращем вк ок на любое другое событие, иначе он перестанет нам слать колбеки
+        else: return('ok')#на любой другой колбэк от vk
+    if request.method=='GET': return ('ok')
 
-@app.route('/index')#форма, которая отправляет POST в /bot. Чтобы удобнее тестить
-def index():
-    return render_template('index.html')
-    
-if __name__== '__main__': app.run(host='0.0.0.0')
+@app.route('/', methods=['POST','GET']) # на этот адрес VK должен отправлять колбэки
+def home():return 'ok'
+
+if __name__== '__main__': app.run(host='0.0.0.0', port=int("80"))
