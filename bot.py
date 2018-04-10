@@ -130,7 +130,7 @@ def bot():
         content=request.get_json()
         if content['type'] == 'confirmation': return secret_key #ответ на подтверждение использования колбэков
         elif content['type'] == 'wall_post_new':
-            group=content['group_id']
+            group='-'+ str(content['group_id'])
             return repost(group) #на событие нового поста вызывается repost()
         else: return('ok')#на любой другой колбэк от vk
     if request.method=='GET': return ('ok')
