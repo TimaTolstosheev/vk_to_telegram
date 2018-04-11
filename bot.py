@@ -135,7 +135,7 @@ def bot():
         else: return('ok')#на любой другой колбэк от vk
     if request.method=='GET': return ('ok')
 
-@app.route('/', methods=['POST','GET']) # на этот адрес VK должен отправлять колбэки
+@app.route('/', methods=['POST','GET'])
 def home():return 'ok'
 
-if __name__== '__main__': app.run(host='0.0.0.0', port=int("80"))
+if __name__== '__main__': app.run(host='0.0.0.0', port=int("80"), debug=True)
